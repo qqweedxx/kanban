@@ -3,6 +3,8 @@ import { DndContext } from '@dnd-kit/core'
 import './App.css'
 import Column from './components/Column'
 import { initialColumns } from './data'
+import Header from './components/Header'
+import Footer from './components/Footer'
 
 function App() {
   const [columns, setColumns] = useState(initialColumns)
@@ -53,6 +55,7 @@ function App() {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
+      <Header />
       <div className="app">
         <h1>Моя Kanban-доска</h1>
         <div className="board">
@@ -67,6 +70,7 @@ function App() {
           ))}
         </div>
       </div>
+      <Footer />
     </DndContext>
   )
 }
