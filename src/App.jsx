@@ -1,4 +1,6 @@
 import './App.css'
+import Column from './components/Column'
+import { initialColumns } from './data'
 
 function App() {
   return (
@@ -6,20 +8,13 @@ function App() {
       <h1>Моя Kanban-доска</h1>
 
       <div className="board">
-        <div className="column">
-          <h2>To Do</h2>
-          <div className="card">Купить хлеб</div>
-          <div className="card">Позвонить маме</div>
-        </div>
-
-        <div className="column">
-          <h2>In Progress</h2>
-          <div className="card">Доделать лабораторную</div>
-        </div>
-
-        <div className="column">
-          <h2>Done</h2>
-        </div>
+        {initialColumns.map((column) => (
+          <Column
+            key={column.id}
+            title={column.title}
+            cards={column.cards}
+          />
+        ))}
       </div>
     </div>
   )
