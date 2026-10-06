@@ -1,25 +1,30 @@
 import { useState } from 'react'
-import Card from './Card'
+import { useDroppable } from '@dnd-kit/core'
+import DraggableCard from './DraggableCard'
 
 function Column({ id, title, cards, onAddCard }) {
-    const [isAdding, setIsAdding] = useState(false)
-    const [newTitle, setNewTitle] = useState('')
+  const [isAdding, setIsAdding] = useState(false)
+  const [newTitle, setNewTitle] = useState('')
 
-    function handleSubmit(e) {
-        e.preventDefault()
-        const trimmed = newTitle.trim()
-        if (!trimmed) return
-        onAddCard(id, trimmed)
-        setNewTitle('')
-        setIsAdding(false)
-    }
+  const { setNodeRef } = useDroppable({ id })
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    const trimmed = newTitle.trim()
+    if (!trimmed) return
+    onAddCard(id, trimmed)
+    setNewTitle('')
+    setIsAdding(false)
+  }
 
   return (
-    <div className="column">
-      <h2>{title}</h2>
+    <div className="column" ref={setNodeRef}>
+      <h2>
+        {title} <span className="count">({cards.length})</span>
+      </h2>
 
       {cards.map((card) => (
-        <Card key={card.id} title={card.title} />
+        <DraggableCard key={card.id} id={card.id} title={card.title} />
       ))}
 
       {isAdding ? (
@@ -33,10 +38,7 @@ function Column({ id, title, cards, onAddCard }) {
           />
         </form>
       ) : (
-        <button
-          className="add-card-btn"
-          onClick={() => setIsAdding(true)}
-        >
+        <button className="add-card-btn" onClick={() => setIsAdding(true)}>
           + Добавить карточку
         </button>
       )}
