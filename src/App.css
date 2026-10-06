@@ -1,0 +1,40 @@
+.app {
+  padding: 20px;
+  font-family: sans-serif;
+  background: #f4f5f7;
+  min-height: 100vh;
+}
+
+h1 {
+  color: #172b4d;
+}
+
+.board {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.column {
+  background: #ebecf0;
+  border-radius: 8px;
+  padding: 12px;
+  width: 250px;
+  min-height: 300px;
+}
+
+.column h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #172b4d;
+}
+
+.card {
+  background: white;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: grab;
+  font-size: 14px;
+}
