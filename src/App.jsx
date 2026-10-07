@@ -7,7 +7,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import CardModal from './components/CardModal'
-import BoardToolbar from './components/BoardToolbar'
+import BoardToolbar from './components/BoardToolBar'
 import BoardTitle from './components/BoardTitle'
 import FilterBar from './components/FilterBar'
 
