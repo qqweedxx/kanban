@@ -26,27 +26,58 @@ function App() {
     )
   }
 
+  function deleteCard(cardId) {
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        cards: col.cards.filter((c) => c.id !== cardId),
+      }))
+    )
+  }
+
+  function setWipLimit(columnId, limit) {
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === columnId ? { ...col, wipLimit: limit } : col
+      )
+    )
+  }
+
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
+
     const cardId = active.id
     const targetColumnId = over.id
 
     setColumns((prev) => {
       let draggedCard = null
+      let sourceColumn = null
       for (const col of prev) {
         const found = col.cards.find((c) => c.id === cardId)
         if (found) {
           draggedCard = found
+          sourceColumn = col
           break
         }
       }
-      if (!draggedCard) return prev
+      if (!draggedCard || !sourceColumn) return prev
 
-      const sourceColumn = prev.find((col) =>
-        col.cards.some((c) => c.id === cardId)
-      )
       if (sourceColumn.id === targetColumnId) return prev
+
+      const targetColumn = prev.find((col) => col.id === targetColumnId)
+      if (!targetColumn) return prev
+
+      if (
+        targetColumn.wipLimit !== null &&
+        targetColumn.cards.length >= targetColumn.wipLimit
+      ) {
+        alert(
+          `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
+            `Сначала завершите текущие задачи.`
+        )
+        return prev
+      }
 
       return prev.map((col) => {
         if (col.id === sourceColumn.id) {
@@ -60,15 +91,6 @@ function App() {
     })
   }
 
-  function deleteCard(cardId) {
-  setColumns((prev) =>
-    prev.map((col) => ({
-      ...col,
-      cards: col.cards.filter((c) => c.id !== cardId),
-    }))
-  )
-}
-
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <Header />
@@ -81,8 +103,10 @@ function App() {
               id={column.id}
               title={column.title}
               cards={column.cards}
+              wipLimit={column.wipLimit}
               onAddCard={addCard}
               onDeleteCard={deleteCard}
+              onSetWipLimit={setWipLimit}
             />
           ))}
         </div>

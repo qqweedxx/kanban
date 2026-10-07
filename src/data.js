@@ -2,6 +2,7 @@ export const initialColumns = [
   {
     id: 'todo',
     title: 'To Do',
+    wipLimit: null,
     cards: [
       { id: 'c1', title: 'Купить хлеб' },
       { id: 'c2', title: 'Позвонить маме' },
@@ -10,13 +11,13 @@ export const initialColumns = [
   {
     id: 'inprogress',
     title: 'In Progress',
-    cards: [
-      { id: 'c3', title: 'Доделать лабораторную' },
-    ],
+    wipLimit: 3,
+    cards: [{ id: 'c3', title: 'Доделать лабораторную' }],
   },
   {
     id: 'done',
     title: 'Done',
+    wipLimit: null,
     cards: [],
   },
 ]
