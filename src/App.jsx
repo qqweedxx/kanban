@@ -7,8 +7,15 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import CardModal from './components/CardModal'
-import BoardToolbar from './components/BoardToolBar'
+import BoardToolbar from './components/BoardToolbar'
 import BoardTitle from './components/BoardTitle'
+import FilterBar from './components/FilterBar'
+
+let idCounter = 0
+function uid() {
+  idCounter += 1
+  return `${Date.now()}-${idCounter}`
+}
 
 function App() {
   const [projects, setProjects] = useState(() => {
@@ -20,7 +27,6 @@ function App() {
     const saved = localStorage.getItem('kanban-boards')
     if (saved) return JSON.parse(saved)
 
-    // Миграция старых данных (если были под ключом kanban-columns)
     const oldColumns = localStorage.getItem('kanban-columns')
     return [
       {
@@ -37,6 +43,10 @@ function App() {
   })
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [priorityFilter, setPriorityFilter] = useState('all')
+  const [labelFilter, setLabelFilter] = useState('all')
+  const [assigneeFilter, setAssigneeFilter] = useState('all')
+
   const [editingCardId, setEditingCardId] = useState(null)
   const [isAddingColumn, setIsAddingColumn] = useState(false)
   const [newColumnTitle, setNewColumnTitle] = useState('')
@@ -56,7 +66,6 @@ function App() {
   const currentBoard = boards.find((b) => b.id === currentBoardId)
   const columns = currentBoard?.columns || []
 
-  // Хелпер: обновить колонки текущей доски
   function updateColumns(updater) {
     setBoards((prev) =>
       prev.map((b) =>
@@ -91,10 +100,7 @@ function App() {
         col.id === columnId
           ? {
               ...col,
-              cards: [
-                ...col.cards,
-                { id: Date.now().toString(), title },
-              ],
+              cards: [...col.cards, { id: uid(), title }],
             }
           : col
       )
@@ -123,7 +129,7 @@ function App() {
 
   function addComment(cardId, text) {
     const comment = {
-      id: Date.now().toString(),
+      id: uid(),
       author: 'Вы',
       text,
       date: new Date().toISOString(),
@@ -154,7 +160,7 @@ function App() {
     updateColumns((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        id: uid(),
         title: trimmed,
         wipLimit: null,
         cards: [],
@@ -226,20 +232,19 @@ function App() {
     )
   }
 
-  // === ДОСКИ И ПРОЕКТЫ ===
-
   function selectBoard(boardId) {
     setCurrentBoardId(boardId)
     setEditingCardId(null)
     setSearchQuery('')
+    setPriorityFilter('all')
+    setLabelFilter('all')
+    setAssigneeFilter('all')
   }
 
   function createBoard(name) {
-    const newId = Date.now().toString()
-    const projectId =
-      currentBoard?.projectId || projects[0]?.id || 'p1'
+    const newId = uid()
+    const projectId = currentBoard?.projectId || projects[0]?.id || 'p1'
 
-    const baseId = Date.now().toString()
     setBoards((prev) => [
       ...prev,
       {
@@ -247,9 +252,9 @@ function App() {
         projectId,
         name,
         columns: [
-          { id: `${baseId}-todo`, title: 'To Do', wipLimit: null, cards: [] },
-          { id: `${baseId}-progress`, title: 'In Progress', wipLimit: 3, cards: [] },
-          { id: `${baseId}-done`, title: 'Done', wipLimit: null, cards: [] },
+          { id: uid(), title: 'To Do', wipLimit: null, cards: [] },
+          { id: uid(), title: 'In Progress', wipLimit: 3, cards: [] },
+          { id: uid(), title: 'Done', wipLimit: null, cards: [] },
         ],
       },
     ])
@@ -257,51 +262,50 @@ function App() {
   }
 
   function deleteBoard(boardId) {
-  if (boards.length <= 1) {
-    alert('Нельзя удалить последнюю доску')
-    return
-  }
-  if (!confirm('Удалить доску со всеми колонками и карточками?')) return
+    if (boards.length <= 1) {
+      alert('Нельзя удалить последнюю доску')
+      return
+    }
+    if (!confirm('Удалить доску со всеми колонками и карточками?')) return
 
-  const boardToDelete = boards.find((b) => b.id === boardId)
-  const remainingBoards = boards.filter((b) => b.id !== boardId)
+    const boardToDelete = boards.find((b) => b.id === boardId)
+    const remainingBoards = boards.filter((b) => b.id !== boardId)
 
-  setBoards(remainingBoards)
+    setBoards(remainingBoards)
 
-  if (boardToDelete) {
-    const projectStillHasBoards = remainingBoards.some(
-      (b) => b.projectId === boardToDelete.projectId
-    )
-    if (!projectStillHasBoards) {
-      setProjects((prev) =>
-        prev.filter((p) => p.id !== boardToDelete.projectId)
+    if (boardToDelete) {
+      const projectStillHasBoards = remainingBoards.some(
+        (b) => b.projectId === boardToDelete.projectId
       )
+      if (!projectStillHasBoards) {
+        setProjects((prev) =>
+          prev.filter((p) => p.id !== boardToDelete.projectId)
+        )
+      }
+    }
+
+    if (boardId === currentBoardId) {
+      setCurrentBoardId(remainingBoards[0].id)
     }
   }
 
-  if (boardId === currentBoardId) {
-    setCurrentBoardId(remainingBoards[0].id)
-  }
-}
-
   function renameBoard(boardId, newName) {
-  if (!newName || !newName.trim()) return
-  setBoards((prev) =>
-    prev.map((b) =>
-      b.id === boardId ? { ...b, name: newName.trim() } : b
+    if (!newName || !newName.trim()) return
+    setBoards((prev) =>
+      prev.map((b) =>
+        b.id === boardId ? { ...b, name: newName.trim() } : b
+      )
     )
-  )
-}
+  }
 
   function createProject() {
     const name = prompt('Название проекта:')
     if (!name || !name.trim()) return
 
-    const newProjectId = Date.now().toString()
+    const newProjectId = uid()
     setProjects((prev) => [...prev, { id: newProjectId, name: name.trim() }])
 
-    const newBoardId = Date.now().toString() + '-b'
-    const baseId = Date.now().toString()
+    const newBoardId = uid()
     setBoards((prev) => [
       ...prev,
       {
@@ -309,13 +313,51 @@ function App() {
         projectId: newProjectId,
         name: 'Основная доска',
         columns: [
-          { id: `${baseId}-todo`, title: 'To Do', wipLimit: null, cards: [] },
-          { id: `${baseId}-progress`, title: 'In Progress', wipLimit: 3, cards: [] },
-          { id: `${baseId}-done`, title: 'Done', wipLimit: null, cards: [] },
+          { id: uid(), title: 'To Do', wipLimit: null, cards: [] },
+          { id: uid(), title: 'In Progress', wipLimit: 3, cards: [] },
+          { id: uid(), title: 'Done', wipLimit: null, cards: [] },
         ],
       },
     ])
     setCurrentBoardId(newBoardId)
+  }
+
+  // Собираем все доступные метки и исполнителей на текущей доске
+  const allCards = columns.flatMap((c) => c.cards)
+  const availableLabels = Array.from(
+    new Set(allCards.flatMap((c) => c.labels || []))
+  ).sort()
+  const availableAssignees = Array.from(
+    new Set(allCards.map((c) => c.assignee).filter(Boolean))
+  ).sort()
+
+  function filterCards(cards) {
+    return cards.filter((card) => {
+      // Поиск по названию
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase()
+        if (!card.title.toLowerCase().includes(q)) return false
+      }
+      // Приоритет
+      if (priorityFilter !== 'all') {
+        if ((card.priority || 'medium') !== priorityFilter) return false
+      }
+      // Метка
+      if (labelFilter !== 'all') {
+        if (!card.labels || !card.labels.includes(labelFilter)) return false
+      }
+      // Исполнитель
+      if (assigneeFilter !== 'all') {
+        if (card.assignee !== assigneeFilter) return false
+      }
+      return true
+    })
+  }
+
+  function resetFilters() {
+    setPriorityFilter('all')
+    setLabelFilter('all')
+    setAssigneeFilter('all')
   }
 
   const editingCard = editingCardId
@@ -327,9 +369,9 @@ function App() {
       <Header />
       <div className="app">
         <BoardTitle
-  title={currentBoard?.name || 'Моя Kanban-доска'}
-  onRename={(newName) => renameBoard(currentBoardId, newName)}
-/>
+          title={currentBoard?.name || 'Моя Kanban-доска'}
+          onRename={(newName) => renameBoard(currentBoardId, newName)}
+        />
 
         <BoardToolbar
           projects={projects}
@@ -343,13 +385,21 @@ function App() {
 
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
+        <FilterBar
+          priorityFilter={priorityFilter}
+          labelFilter={labelFilter}
+          assigneeFilter={assigneeFilter}
+          availableLabels={availableLabels}
+          availableAssignees={availableAssignees}
+          onChangePriority={setPriorityFilter}
+          onChangeLabel={setLabelFilter}
+          onChangeAssignee={setAssigneeFilter}
+          onReset={resetFilters}
+        />
+
         <div className="board">
           {columns.map((column) => {
-            const filteredCards = searchQuery.trim()
-              ? column.cards.filter((card) =>
-                  card.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
-                )
-              : column.cards
+            const filteredCards = filterCards(column.cards)
 
             return (
               <Column

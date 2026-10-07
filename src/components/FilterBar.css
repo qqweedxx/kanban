@@ -1,0 +1,37 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.filter-bar__select {
+  padding: 6px 10px;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #172b4d;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  min-width: 160px;
+}
+
+.filter-bar__select:focus {
+  border-color: #4c9aff;
+}
+
+.filter-bar__reset {
+  padding: 6px 12px;
+  background: transparent;
+  color: #de350b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-bar__reset:hover {
+  background: #ffebe6;
+}
