@@ -1,0 +1,23 @@
+.board-title {
+  color: #172b4d;
+  cursor: pointer;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.board-title:hover {
+  color: #0052cc;
+}
+
+.board-title-input {
+  font-size: 32px;
+  font-weight: 700;
+  color: #172b4d;
+  background: #ffffff;
+  border: 1px solid #4c9aff;
+  border-radius: 4px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
+  max-width: 500px;
+}

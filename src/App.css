@@ -48,3 +48,66 @@ h1 {
 .add-column-btn:hover {
   background: rgba(9, 30, 66, 0.12);
 }
+
+.add-column-form {
+  flex-shrink: 0;
+  width: 250px;
+  background: #ebecf0;
+  border-radius: 8px;
+  padding: 12px;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-column-form input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #172b4d;
+  background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.add-column-form input:focus {
+  border-color: #4c9aff;
+}
+
+.add-column-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.add-column-actions button[type="submit"] {
+  flex: 1;
+  padding: 8px 12px;
+  background: #0052cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-column-actions button[type="submit"]:hover {
+  background: #0747a6;
+}
+
+.add-column-actions button[type="button"] {
+  padding: 8px 12px;
+  background: transparent;
+  color: #42526e;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.add-column-actions button[type="button"]:hover {
+  background: rgba(9, 30, 66, 0.08);
+}
