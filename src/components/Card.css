@@ -34,3 +34,35 @@
 .card {
   animation: card-appear 0.2s ease-out;
 }
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.card-title {
+  flex: 1;
+  word-break: break-word;
+}
+
+.card-delete {
+  background: none;
+  border: none;
+  color: #97a0af;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.card:hover .card-delete {
+  opacity: 1;
+}
+
+.card-delete:hover {
+  color: #eb5a46;
+}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import DraggableCard from './DraggableCard'
 
-function Column({ id, title, cards, onAddCard }) {
+function Column({ id, title, cards, onAddCard, onDeleteCard }) {
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
 
@@ -24,7 +24,7 @@ function Column({ id, title, cards, onAddCard }) {
       </h2>
 
       {cards.map((card) => (
-        <DraggableCard key={card.id} id={card.id} title={card.title} />
+        <DraggableCard key={card.id} id={card.id} title={card.title} onDelete={() => onDeleteCard(card.id)} />
       ))}
 
       {isAdding ? (

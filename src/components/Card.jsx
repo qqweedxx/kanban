@@ -1,7 +1,19 @@
 import './Card.css'
 
-function Card({ title }) {
-  return <div className="card">{title}</div>
+function Card({ title, onDelete }) {
+  return (
+    <div className="card">
+      <span className="card-title">{title}</span>
+      <button
+        className="card-delete"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={onDelete}
+        title="Удалить"
+      >
+        ×
+      </button>
+    </div>
+  )
 }
 
 export default Card

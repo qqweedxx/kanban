@@ -60,6 +60,15 @@ function App() {
     })
   }
 
+  function deleteCard(cardId) {
+  setColumns((prev) =>
+    prev.map((col) => ({
+      ...col,
+      cards: col.cards.filter((c) => c.id !== cardId),
+    }))
+  )
+}
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <Header />
@@ -73,6 +82,7 @@ function App() {
               title={column.title}
               cards={column.cards}
               onAddCard={addCard}
+              onDeleteCard={deleteCard}
             />
           ))}
         </div>
