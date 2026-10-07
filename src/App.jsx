@@ -98,6 +98,34 @@ function App() {
     )
   }
 
+  function addColumn() {
+    const title = prompt('Название колонки:')
+    if (!title || !title.trim()) return
+    setColumns((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        title: title.trim(),
+        wipLimit: null,
+        cards: [],
+      },
+    ])
+  }
+
+  function renameColumn(columnId, newTitle) {
+    if (!newTitle || !newTitle.trim()) return
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === columnId ? { ...col, title: newTitle.trim() } : col
+      )
+    )
+  }
+
+  function deleteColumn(columnId) {
+    if (!confirm('Удалить колонку со всеми карточками?')) return
+    setColumns((prev) => prev.filter((col) => col.id !== columnId))
+  }
+
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
@@ -170,6 +198,8 @@ function App() {
                 onDeleteCard={deleteCard}
                 onSetWipLimit={setWipLimit}
                 onOpenCard={(cardId) => setEditingCardId(cardId)}
+                onRenameColumn={renameColumn}
+                onDeleteColumn={deleteColumn}
               />
             )
           })}
