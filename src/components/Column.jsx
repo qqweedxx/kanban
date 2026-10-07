@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import DraggableCard from './DraggableCard'
+import './Column.css'
 
-function Column({ id, title, cards, onAddCard, onDeleteCard }) {
+function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipLimit }) {
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
 
@@ -20,11 +21,44 @@ function Column({ id, title, cards, onAddCard, onDeleteCard }) {
   return (
     <div className="column" ref={setNodeRef}>
       <h2>
-        {title} <span className="count">({cards.length})</span>
+        {title}{' '}
+        <span
+          className={`count ${
+            wipLimit && cards.length >= wipLimit ? 'over-limit' : ''
+          }`}
+        >
+          ({cards.length}
+          {wipLimit ? ` / ${wipLimit}` : ''})
+        </span>
+
+        <button
+          className="limit-btn"
+          onClick={() => {
+            const value = prompt('WIP-лимит (пусто — без лимита):', wipLimit ?? '')
+            if (value === null) return
+            if (value === '') {
+              onSetWipLimit(id, null)
+              return
+            }
+            const num = Number(value)
+            if (isNaN(num) || num < 1) {
+              alert('Введите положительное число')
+              return
+            }
+            onSetWipLimit(id, num)
+          }}
+        >
+          Лимит
+        </button>
       </h2>
 
       {cards.map((card) => (
-        <DraggableCard key={card.id} id={card.id} title={card.title} onDelete={() => onDeleteCard(card.id)} />
+        <DraggableCard
+          key={card.id}
+          id={card.id}
+          title={card.title}
+          onDelete={() => onDeleteCard(card.id)}
+        />
       ))}
 
       {isAdding ? (

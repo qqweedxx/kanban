@@ -17,9 +17,8 @@ function App() {
   }, [columns])
 
   function addCard(columnId, title) {
-  setColumns((prev) => {
-    const targetColumn = prev.find((col) => col.id === columnId)
-    if (!targetColumn) return prev
+    const targetColumn = columns.find((col) => col.id === columnId)
+    if (!targetColumn) return
 
     if (
       targetColumn.wipLimit !== null &&
@@ -29,22 +28,23 @@ function App() {
         `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
           `Сначала завершите текущие задачи.`
       )
-      return prev
+      return
     }
 
-    return prev.map((col) =>
-      col.id === columnId
-        ? {
-            ...col,
-            cards: [
-              ...col.cards,
-              { id: Date.now().toString(), title },
-            ],
-          }
-        : col
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === columnId
+          ? {
+              ...col,
+              cards: [
+                ...col.cards,
+                { id: Date.now().toString(), title },
+              ],
+            }
+          : col
+      )
     )
-  })
-}
+  }
 
   function deleteCard(cardId) {
     setColumns((prev) =>
@@ -70,36 +70,31 @@ function App() {
     const cardId = active.id
     const targetColumnId = over.id
 
-    setColumns((prev) => {
-      let draggedCard = null
-      let sourceColumn = null
-      for (const col of prev) {
-        const found = col.cards.find((c) => c.id === cardId)
-        if (found) {
-          draggedCard = found
-          sourceColumn = col
-          break
-        }
-      }
-      if (!draggedCard || !sourceColumn) return prev
+    const sourceColumn = columns.find((col) =>
+      col.cards.some((c) => c.id === cardId)
+    )
+    if (!sourceColumn) return
+    if (sourceColumn.id === targetColumnId) return
 
-      if (sourceColumn.id === targetColumnId) return prev
+    const targetColumn = columns.find((col) => col.id === targetColumnId)
+    if (!targetColumn) return
 
-      const targetColumn = prev.find((col) => col.id === targetColumnId)
-      if (!targetColumn) return prev
+    if (
+      targetColumn.wipLimit !== null &&
+      targetColumn.cards.length >= targetColumn.wipLimit
+    ) {
+      alert(
+        `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
+          `Сначала завершите текущие задачи.`
+      )
+      return
+    }
 
-      if (
-        targetColumn.wipLimit !== null &&
-        targetColumn.cards.length >= targetColumn.wipLimit
-      ) {
-        alert(
-          `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
-            `Сначала завершите текущие задачи.`
-        )
-        return prev
-      }
+    const draggedCard = sourceColumn.cards.find((c) => c.id === cardId)
+    if (!draggedCard) return
 
-      return prev.map((col) => {
+    setColumns((prev) =>
+      prev.map((col) => {
         if (col.id === sourceColumn.id) {
           return { ...col, cards: col.cards.filter((c) => c.id !== cardId) }
         }
@@ -108,7 +103,7 @@ function App() {
         }
         return col
       })
-    })
+    )
   }
 
   return (

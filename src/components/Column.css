@@ -1,0 +1,28 @@
+.count {
+  font-size: 13px;
+  color: #6b778c;
+  font-weight: normal;
+  margin-left: 4px;
+}
+
+.count.over-limit {
+  color: #eb5a46;
+  font-weight: bold;
+}
+
+.limit-btn {
+  font-size: 12px;
+  color: #6b778c;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 2px 6px;
+  margin-left: 6px;
+  border-radius: 3px;
+}
+
+.limit-btn:hover {
+  color: #172b4d;
+  background: rgba(9, 30, 66, 0.08);
+  border-color: rgba(9, 30, 66, 0.1);
+}
