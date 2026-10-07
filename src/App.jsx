@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DndContext } from '@dnd-kit/core'
 import './App.css'
 import Column from './components/Column'
@@ -7,7 +7,14 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 
 function App() {
-  const [columns, setColumns] = useState(initialColumns)
+  const [columns, setColumns] = useState(() => {
+    const saved = localStorage.getItem('kanban-columns')
+    return saved ? JSON.parse(saved) : initialColumns
+  })
+
+  useEffect(() => {
+    localStorage.setItem('kanban-columns', JSON.stringify(columns))
+  }, [columns])
 
   function addCard(columnId, title) {
     setColumns((prev) =>
