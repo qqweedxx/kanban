@@ -6,6 +6,7 @@ import { initialColumns } from './data'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
+import CardModal from './components/CardModal'
 
 function App() {
   const [columns, setColumns] = useState(() => {
@@ -14,6 +15,7 @@ function App() {
   })
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [editingCardId, setEditingCardId] = useState(null)
 
   useEffect(() => {
     localStorage.setItem('kanban-columns', JSON.stringify(columns))
@@ -49,13 +51,41 @@ function App() {
     })
   }
 
-    
-
   function deleteCard(cardId) {
     setColumns((prev) =>
       prev.map((col) => ({
         ...col,
         cards: col.cards.filter((c) => c.id !== cardId),
+      }))
+    )
+  }
+
+  function updateCard(cardId, updates) {
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        cards: col.cards.map((c) =>
+          c.id === cardId ? { ...c, ...updates } : c
+        ),
+      }))
+    )
+  }
+
+  function addComment(cardId, text) {
+    const comment = {
+      id: Date.now().toString(),
+      author: 'Вы',
+      text,
+      date: new Date().toISOString(),
+    }
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        cards: col.cards.map((c) =>
+          c.id === cardId
+            ? { ...c, comments: [...(c.comments || []), comment] }
+            : c
+        ),
       }))
     )
   }
@@ -111,6 +141,10 @@ function App() {
     )
   }
 
+  const editingCard = editingCardId
+    ? columns.flatMap((c) => c.cards).find((c) => c.id === editingCardId)
+    : null
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <Header />
@@ -135,12 +169,22 @@ function App() {
                 onAddCard={addCard}
                 onDeleteCard={deleteCard}
                 onSetWipLimit={setWipLimit}
+                onOpenCard={(cardId) => setEditingCardId(cardId)}
               />
             )
           })}
         </div>
       </div>
       <Footer />
+
+      {editingCard && (
+        <CardModal
+          card={editingCard}
+          onClose={() => setEditingCardId(null)}
+          onSave={updateCard}
+          onAddComment={addComment}
+        />
+      )}
     </DndContext>
   )
 }

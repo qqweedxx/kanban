@@ -1,8 +1,8 @@
 import './Card.css'
 
-function Card({ title, onDelete }) {
+function Card({ title, onDelete, onOpen }) {
   return (
-    <div className="card">
+    <div className="card" onDoubleClick={onOpen}>
       <span className="card-title">{title}</span>
       <button
         className="card-delete"

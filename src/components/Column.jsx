@@ -3,7 +3,7 @@ import { useDroppable } from '@dnd-kit/core'
 import DraggableCard from './DraggableCard'
 import './Column.css'
 
-function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipLimit }) {
+function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipLimit, onOpenCard }) {
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [isEditingLimit, setIsEditingLimit] = useState(false)
@@ -80,6 +80,7 @@ function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipL
           id={card.id}
           title={card.title}
           onDelete={onDeleteCard}
+          onOpen={() => onOpenCard(card.id)}
         />
       ))}
 
