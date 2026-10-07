@@ -7,11 +7,33 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import CardModal from './components/CardModal'
+import BoardToolbar from './components/BoardToolBar'
+import BoardTitle from './components/BoardTitle'
 
 function App() {
-  const [columns, setColumns] = useState(() => {
-    const saved = localStorage.getItem('kanban-columns')
-    return saved ? JSON.parse(saved) : initialColumns
+  const [projects, setProjects] = useState(() => {
+    const saved = localStorage.getItem('kanban-projects')
+    return saved ? JSON.parse(saved) : [{ id: 'p1', name: 'Учебный проект' }]
+  })
+
+  const [boards, setBoards] = useState(() => {
+    const saved = localStorage.getItem('kanban-boards')
+    if (saved) return JSON.parse(saved)
+
+    // Миграция старых данных (если были под ключом kanban-columns)
+    const oldColumns = localStorage.getItem('kanban-columns')
+    return [
+      {
+        id: 'b1',
+        projectId: 'p1',
+        name: 'Основная доска',
+        columns: oldColumns ? JSON.parse(oldColumns) : initialColumns,
+      },
+    ]
+  })
+
+  const [currentBoardId, setCurrentBoardId] = useState(() => {
+    return localStorage.getItem('kanban-currentBoardId') || 'b1'
   })
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,11 +42,37 @@ function App() {
   const [newColumnTitle, setNewColumnTitle] = useState('')
 
   useEffect(() => {
-    localStorage.setItem('kanban-columns', JSON.stringify(columns))
-  }, [columns])
+    localStorage.setItem('kanban-projects', JSON.stringify(projects))
+  }, [projects])
+
+  useEffect(() => {
+    localStorage.setItem('kanban-boards', JSON.stringify(boards))
+  }, [boards])
+
+  useEffect(() => {
+    localStorage.setItem('kanban-currentBoardId', currentBoardId)
+  }, [currentBoardId])
+
+  const currentBoard = boards.find((b) => b.id === currentBoardId)
+  const columns = currentBoard?.columns || []
+
+  // Хелпер: обновить колонки текущей доски
+  function updateColumns(updater) {
+    setBoards((prev) =>
+      prev.map((b) =>
+        b.id === currentBoardId
+          ? {
+              ...b,
+              columns:
+                typeof updater === 'function' ? updater(b.columns) : updater,
+            }
+          : b
+      )
+    )
+  }
 
   function addCard(columnId, title) {
-    setColumns((prev) => {
+    updateColumns((prev) => {
       const targetColumn = prev.find((col) => col.id === columnId)
       if (!targetColumn) return prev
 
@@ -54,7 +102,7 @@ function App() {
   }
 
   function deleteCard(cardId) {
-    setColumns((prev) =>
+    updateColumns((prev) =>
       prev.map((col) => ({
         ...col,
         cards: col.cards.filter((c) => c.id !== cardId),
@@ -63,7 +111,7 @@ function App() {
   }
 
   function updateCard(cardId, updates) {
-    setColumns((prev) =>
+    updateColumns((prev) =>
       prev.map((col) => ({
         ...col,
         cards: col.cards.map((c) =>
@@ -80,7 +128,7 @@ function App() {
       text,
       date: new Date().toISOString(),
     }
-    setColumns((prev) =>
+    updateColumns((prev) =>
       prev.map((col) => ({
         ...col,
         cards: col.cards.map((c) =>
@@ -93,7 +141,7 @@ function App() {
   }
 
   function setWipLimit(columnId, limit) {
-    setColumns((prev) =>
+    updateColumns((prev) =>
       prev.map((col) =>
         col.id === columnId ? { ...col, wipLimit: limit } : col
       )
@@ -103,7 +151,7 @@ function App() {
   function addColumn(title) {
     const trimmed = title.trim()
     if (!trimmed) return
-    setColumns((prev) => [
+    updateColumns((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
@@ -123,7 +171,7 @@ function App() {
 
   function renameColumn(columnId, newTitle) {
     if (!newTitle || !newTitle.trim()) return
-    setColumns((prev) =>
+    updateColumns((prev) =>
       prev.map((col) =>
         col.id === columnId ? { ...col, title: newTitle.trim() } : col
       )
@@ -132,7 +180,7 @@ function App() {
 
   function deleteColumn(columnId) {
     if (!confirm('Удалить колонку со всеми карточками?')) return
-    setColumns((prev) => prev.filter((col) => col.id !== columnId))
+    updateColumns((prev) => prev.filter((col) => col.id !== columnId))
   }
 
   function handleDragEnd(event) {
@@ -165,7 +213,7 @@ function App() {
     const draggedCard = sourceColumn.cards.find((c) => c.id === cardId)
     if (!draggedCard) return
 
-    setColumns((prev) =>
+    updateColumns((prev) =>
       prev.map((col) => {
         if (col.id === sourceColumn.id) {
           return { ...col, cards: col.cards.filter((c) => c.id !== cardId) }
@@ -178,6 +226,98 @@ function App() {
     )
   }
 
+  // === ДОСКИ И ПРОЕКТЫ ===
+
+  function selectBoard(boardId) {
+    setCurrentBoardId(boardId)
+    setEditingCardId(null)
+    setSearchQuery('')
+  }
+
+  function createBoard(name) {
+    const newId = Date.now().toString()
+    const projectId =
+      currentBoard?.projectId || projects[0]?.id || 'p1'
+
+    const baseId = Date.now().toString()
+    setBoards((prev) => [
+      ...prev,
+      {
+        id: newId,
+        projectId,
+        name,
+        columns: [
+          { id: `${baseId}-todo`, title: 'To Do', wipLimit: null, cards: [] },
+          { id: `${baseId}-progress`, title: 'In Progress', wipLimit: 3, cards: [] },
+          { id: `${baseId}-done`, title: 'Done', wipLimit: null, cards: [] },
+        ],
+      },
+    ])
+    setCurrentBoardId(newId)
+  }
+
+  function deleteBoard(boardId) {
+  if (boards.length <= 1) {
+    alert('Нельзя удалить последнюю доску')
+    return
+  }
+  if (!confirm('Удалить доску со всеми колонками и карточками?')) return
+
+  const boardToDelete = boards.find((b) => b.id === boardId)
+  const remainingBoards = boards.filter((b) => b.id !== boardId)
+
+  setBoards(remainingBoards)
+
+  if (boardToDelete) {
+    const projectStillHasBoards = remainingBoards.some(
+      (b) => b.projectId === boardToDelete.projectId
+    )
+    if (!projectStillHasBoards) {
+      setProjects((prev) =>
+        prev.filter((p) => p.id !== boardToDelete.projectId)
+      )
+    }
+  }
+
+  if (boardId === currentBoardId) {
+    setCurrentBoardId(remainingBoards[0].id)
+  }
+}
+
+  function renameBoard(boardId, newName) {
+  if (!newName || !newName.trim()) return
+  setBoards((prev) =>
+    prev.map((b) =>
+      b.id === boardId ? { ...b, name: newName.trim() } : b
+    )
+  )
+}
+
+  function createProject() {
+    const name = prompt('Название проекта:')
+    if (!name || !name.trim()) return
+
+    const newProjectId = Date.now().toString()
+    setProjects((prev) => [...prev, { id: newProjectId, name: name.trim() }])
+
+    const newBoardId = Date.now().toString() + '-b'
+    const baseId = Date.now().toString()
+    setBoards((prev) => [
+      ...prev,
+      {
+        id: newBoardId,
+        projectId: newProjectId,
+        name: 'Основная доска',
+        columns: [
+          { id: `${baseId}-todo`, title: 'To Do', wipLimit: null, cards: [] },
+          { id: `${baseId}-progress`, title: 'In Progress', wipLimit: 3, cards: [] },
+          { id: `${baseId}-done`, title: 'Done', wipLimit: null, cards: [] },
+        ],
+      },
+    ])
+    setCurrentBoardId(newBoardId)
+  }
+
   const editingCard = editingCardId
     ? columns.flatMap((c) => c.cards).find((c) => c.id === editingCardId)
     : null
@@ -186,8 +326,23 @@ function App() {
     <DndContext onDragEnd={handleDragEnd}>
       <Header />
       <div className="app">
-        <h1>Моя Kanban-доска</h1>
+        <BoardTitle
+  title={currentBoard?.name || 'Моя Kanban-доска'}
+  onRename={(newName) => renameBoard(currentBoardId, newName)}
+/>
+
+        <BoardToolbar
+          projects={projects}
+          boards={boards}
+          currentBoardId={currentBoardId}
+          onSelectBoard={selectBoard}
+          onCreateBoard={createBoard}
+          onCreateProject={createProject}
+          onDeleteBoard={deleteBoard}
+        />
+
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
+
         <div className="board">
           {columns.map((column) => {
             const filteredCards = searchQuery.trim()
