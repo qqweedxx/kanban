@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import Card from './Card'
 
-function DraggableCard({ id, title, onDelete, onOpen }) {
+function DraggableCard({ id, title, card, onDelete, onOpen }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id })
 
   const style = transform
@@ -10,7 +10,12 @@ function DraggableCard({ id, title, onDelete, onOpen }) {
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <Card title={title} onDelete={() => onDelete(id)} onOpen={onOpen} />
+      <Card
+        title={title}
+        card={card}
+        onDelete={() => onDelete(id)}
+        onOpen={onOpen}
+      />
     </div>
   )
 }

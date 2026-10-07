@@ -103,6 +103,7 @@ function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipL
           key={card.id}
           id={card.id}
           title={card.title}
+          card={card}
           onDelete={onDeleteCard}
           onOpen={() => onOpenCard(card.id)}
         />

@@ -203,6 +203,10 @@ function App() {
               />
             )
           })}
+
+          <button className="add-column-btn" onClick={addColumn}>
+            + Колонка
+          </button>
         </div>
       </div>
       <Footer />
