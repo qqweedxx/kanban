@@ -29,3 +29,9 @@ server/node_modules
 server/.env
 server/dev.db
 server/dev.db-journal
+
+# IDE / AI assistants
+server/.agents/
+server/.claude/
+server/.windsurf/
+server/skills-lock.json
