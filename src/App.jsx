@@ -17,14 +17,34 @@ function App() {
   }, [columns])
 
   function addCard(columnId, title) {
-    setColumns((prev) =>
-      prev.map((col) =>
-        col.id === columnId
-          ? { ...col, cards: [...col.cards, { id: Date.now().toString(), title }] }
-          : col
+  setColumns((prev) => {
+    const targetColumn = prev.find((col) => col.id === columnId)
+    if (!targetColumn) return prev
+
+    if (
+      targetColumn.wipLimit !== null &&
+      targetColumn.cards.length >= targetColumn.wipLimit
+    ) {
+      alert(
+        `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
+          `Сначала завершите текущие задачи.`
       )
+      return prev
+    }
+
+    return prev.map((col) =>
+      col.id === columnId
+        ? {
+            ...col,
+            cards: [
+              ...col.cards,
+              { id: Date.now().toString(), title },
+            ],
+          }
+        : col
     )
-  }
+  })
+}
 
   function deleteCard(cardId) {
     setColumns((prev) =>
