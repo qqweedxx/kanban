@@ -5,6 +5,7 @@ import Column from './components/Column'
 import { initialColumns } from './data'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import SearchBar from './components/SearchBar'
 
 function App() {
   const [columns, setColumns] = useState(() => {
@@ -12,27 +13,29 @@ function App() {
     return saved ? JSON.parse(saved) : initialColumns
   })
 
+  const [searchQuery, setSearchQuery] = useState('')
+
   useEffect(() => {
     localStorage.setItem('kanban-columns', JSON.stringify(columns))
   }, [columns])
 
   function addCard(columnId, title) {
-    const targetColumn = columns.find((col) => col.id === columnId)
-    if (!targetColumn) return
+    setColumns((prev) => {
+      const targetColumn = prev.find((col) => col.id === columnId)
+      if (!targetColumn) return prev
 
-    if (
-      targetColumn.wipLimit !== null &&
-      targetColumn.cards.length >= targetColumn.wipLimit
-    ) {
-      alert(
-        `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
-          `Сначала завершите текущие задачи.`
-      )
-      return
-    }
+      if (
+        targetColumn.wipLimit !== null &&
+        targetColumn.cards.length >= targetColumn.wipLimit
+      ) {
+        alert(
+          `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit}). ` +
+            `Сначала завершите текущие задачи.`
+        )
+        return prev
+      }
 
-    setColumns((prev) =>
-      prev.map((col) =>
+      return prev.map((col) =>
         col.id === columnId
           ? {
               ...col,
@@ -43,8 +46,10 @@ function App() {
             }
           : col
       )
-    )
+    })
   }
+
+    
 
   function deleteCard(cardId) {
     setColumns((prev) =>
@@ -111,19 +116,28 @@ function App() {
       <Header />
       <div className="app">
         <h1>Моя Kanban-доска</h1>
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <div className="board">
-          {columns.map((column) => (
-            <Column
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              cards={column.cards}
-              wipLimit={column.wipLimit}
-              onAddCard={addCard}
-              onDeleteCard={deleteCard}
-              onSetWipLimit={setWipLimit}
-            />
-          ))}
+          {columns.map((column) => {
+            const filteredCards = searchQuery.trim()
+              ? column.cards.filter((card) =>
+                  card.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
+                )
+              : column.cards
+
+            return (
+              <Column
+                key={column.id}
+                id={column.id}
+                title={column.title}
+                cards={filteredCards}
+                wipLimit={column.wipLimit}
+                onAddCard={addCard}
+                onDeleteCard={deleteCard}
+                onSetWipLimit={setWipLimit}
+              />
+            )
+          })}
         </div>
       </div>
       <Footer />

@@ -10,7 +10,7 @@ function DraggableCard({ id, title, onDelete }) {
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <Card title={title} onDelete={onDelete} />
+      <Card title={title} onDelete={() => onDelete(id)} />
     </div>
   )
 }
