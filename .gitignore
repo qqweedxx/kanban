@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Backend
+server/node_modules
+server/.env
+server/dev.db
+server/dev.db-journal
