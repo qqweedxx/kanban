@@ -16,6 +16,8 @@ function App() {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [editingCardId, setEditingCardId] = useState(null)
+  const [isAddingColumn, setIsAddingColumn] = useState(false)
+  const [newColumnTitle, setNewColumnTitle] = useState('')
 
   useEffect(() => {
     localStorage.setItem('kanban-columns', JSON.stringify(columns))
@@ -98,18 +100,25 @@ function App() {
     )
   }
 
-  function addColumn() {
-    const title = prompt('Название колонки:')
-    if (!title || !title.trim()) return
+  function addColumn(title) {
+    const trimmed = title.trim()
+    if (!trimmed) return
     setColumns((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
-        title: title.trim(),
+        title: trimmed,
         wipLimit: null,
         cards: [],
       },
     ])
+    setNewColumnTitle('')
+    setIsAddingColumn(false)
+  }
+
+  function handleAddColumnSubmit(e) {
+    e.preventDefault()
+    addColumn(newColumnTitle)
   }
 
   function renameColumn(columnId, newTitle) {
@@ -204,9 +213,38 @@ function App() {
             )
           })}
 
-          <button className="add-column-btn" onClick={addColumn}>
-            + Колонка
-          </button>
+          {isAddingColumn ? (
+            <form className="add-column-form" onSubmit={handleAddColumnSubmit}>
+              <input
+                autoFocus
+                value={newColumnTitle}
+                onChange={(e) => setNewColumnTitle(e.target.value)}
+                placeholder="Название колонки"
+                onBlur={() => {
+                  if (!newColumnTitle.trim()) setIsAddingColumn(false)
+                }}
+              />
+              <div className="add-column-actions">
+                <button type="submit">Добавить</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewColumnTitle('')
+                    setIsAddingColumn(false)
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              className="add-column-btn"
+              onClick={() => setIsAddingColumn(true)}
+            >
+              + Колонка
+            </button>
+          )}
         </div>
       </div>
       <Footer />
