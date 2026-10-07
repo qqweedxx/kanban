@@ -6,6 +6,8 @@ import './Column.css'
 function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipLimit }) {
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
+  const [isEditingLimit, setIsEditingLimit] = useState(false)
+  const [limitInput, setLimitInput] = useState('')
 
   const { setNodeRef } = useDroppable({ id })
 
@@ -16,6 +18,28 @@ function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipL
     onAddCard(id, trimmed)
     setNewTitle('')
     setIsAdding(false)
+  }
+
+  function openLimitEditor() {
+    setLimitInput(wipLimit ?? '')
+    setIsEditingLimit(true)
+  }
+
+  function saveLimit(e) {
+    e.preventDefault()
+    const trimmed = limitInput.trim()
+    if (trimmed === '') {
+      onSetWipLimit(id, null)
+      setIsEditingLimit(false)
+      return
+    }
+    const num = Number(trimmed)
+    if (isNaN(num) || num < 1 || !Number.isInteger(num)) {
+      alert('Введите целое положительное число')
+      return
+    }
+    onSetWipLimit(id, num)
+    setIsEditingLimit(false)
   }
 
   return (
@@ -31,25 +55,23 @@ function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipL
           {wipLimit ? ` / ${wipLimit}` : ''})
         </span>
 
-        <button
-          className="limit-btn"
-          onClick={() => {
-            const value = prompt('WIP-лимит (пусто — без лимита):', wipLimit ?? '')
-            if (value === null) return
-            if (value === '') {
-              onSetWipLimit(id, null)
-              return
-            }
-            const num = Number(value)
-            if (isNaN(num) || num < 1) {
-              alert('Введите положительное число')
-              return
-            }
-            onSetWipLimit(id, num)
-          }}
-        >
-          Лимит
-        </button>
+        {isEditingLimit ? (
+          <form onSubmit={saveLimit} style={{ display: 'inline' }}>
+            <input
+              autoFocus
+              type="number"
+              value={limitInput}
+              onChange={(e) => setLimitInput(e.target.value)}
+              placeholder="Лимит"
+              style={{ width: 50, marginLeft: 6 }}
+              onBlur={() => setIsEditingLimit(false)}
+            />
+          </form>
+        ) : (
+          <button className="limit-btn" onClick={openLimitEditor}>
+            Лимит
+          </button>
+        )}
       </h2>
 
       {cards.map((card) => (
@@ -57,7 +79,7 @@ function Column({ id, title, cards, wipLimit, onAddCard, onDeleteCard, onSetWipL
           key={card.id}
           id={card.id}
           title={card.title}
-          onDelete={() => onDeleteCard(card.id)}
+          onDelete={onDeleteCard}
         />
       ))}
 
