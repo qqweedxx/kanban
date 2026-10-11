@@ -9,6 +9,10 @@ jobs:
     name: Backend Tests
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: file:./dev.db
+      JWT_SECRET: test_secret_for_ci
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies
         working-directory: ./server
@@ -26,9 +30,10 @@ jobs:
         working-directory: ./server
         run: npx prisma generate
 
+      - name: Run migrations
+        working-directory: ./server
+        run: npx prisma migrate deploy
+
       - name: Run tests
         working-directory: ./server
-        env:
-          DATABASE_URL: file:./dev.db
-          JWT_SECRET: test_secret_for_ci
         run: npm test
