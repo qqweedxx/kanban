@@ -10,7 +10,9 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFiles": ["<rootDir>/tests/setup.js"]
+    "setupFiles": [
+      "<rootDir>/tests/setup.js"
+    ]
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -35,6 +37,7 @@
     "jest": "^30.5.2",
     "nodemon": "^3.1.14",
     "prisma": "^7.10.0",
+    "superset": "^3.0.4",
     "supertest": "^7.3.1"
   },
   "allowScripts": {
