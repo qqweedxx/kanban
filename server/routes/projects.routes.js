@@ -1,6 +1,7 @@
 const express = require('express')
 const ctrl = require('../controllers/projects.controller')
 const authMiddleware = require('../middleware/auth')
+const roleMiddleware = require('../middleware/role')
 
 const router = express.Router()
 router.use(authMiddleware)
@@ -92,6 +93,6 @@ router.patch('/:id', ctrl.update)
  *     responses:
  *       200: { description: Проект удалён }
  */
-router.delete('/:id', ctrl.remove)
+router.delete('/:id', roleMiddleware('admin', 'manager'), ctrl.remove)
 
 module.exports = router

@@ -1,6 +1,7 @@
 const express = require('express')
 const cardsController = require('../controllers/cards.controller')
 const authMiddleware = require('../middleware/auth')
+const roleMiddleware = require('../middleware/role')
 
 const router = express.Router()
 
@@ -121,7 +122,7 @@ router.patch('/:id', cardsController.update)
  *     responses:
  *       200: { description: Карточка удалена }
  */
-router.delete('/:id', cardsController.remove)
+router.delete('/:id', roleMiddleware('admin', 'manager'), cardsController.remove)
 
 /**
  * @swagger
