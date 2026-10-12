@@ -28,6 +28,7 @@
 .header__right {
   display: flex;
   gap: 8px;
+  position: relative;
 }
 
 .header__btn {
@@ -41,5 +42,58 @@
 }
 
 .header__btn:hover {
+  background: #ebecf0;
+}
+
+.header__menu {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.header__menu-info {
+  padding: 12px 14px;
+  border-bottom: 1px solid #ebecf0;
+}
+
+.header__menu-name {
+  font-weight: 600;
+  color: #172b4d;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.header__menu-email {
+  color: #6b778c;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.header__menu-role {
+  color: #6b778c;
+  font-size: 12px;
+}
+
+.header__menu-logout {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #172b4d;
+  transition: background 0.15s;
+}
+
+.header__menu-logout:hover {
   background: #ebecf0;
 }

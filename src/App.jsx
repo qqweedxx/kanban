@@ -223,15 +223,13 @@ function App() {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <Header />
+      <Header user={user} onLogout={handleLogout} />
       <div className="app">
         <BoardTitle
           title={currentBoard?.name || 'Моя Kanban-доска'}
           onRename={(newName) => renameBoard(currentBoardId, newName)}
         />
-        <button onClick={handleLogout} style={{ marginLeft: 10, padding: '4px 10px', cursor: 'pointer' }}>
-          Выйти
-        </button>
+        
 
         <BoardToolbar
           projects={projects}
