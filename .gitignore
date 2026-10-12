@@ -35,3 +35,8 @@ server/.agents/
 server/.claude/
 server/.windsurf/
 server/skills-lock.json
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.cache/
