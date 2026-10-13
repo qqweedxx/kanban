@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const { PrismaClient } = require('../generated/prisma/client')
+const { PrismaClient } = require('../generated/prisma')
 const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3')
 
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || 'file:./dev.db' })
