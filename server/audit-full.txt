@@ -1,0 +1,118 @@
+# npm audit report
+
+braces  *
+Severity: high
+braces vulnerable to stack-exhaustion denial of service through deeply nested patterns - https://github.com/advisories/GHSA-vfj7-8cjw-p6xm
+fix available via `npm audit fix --force`
+Will install nodemon@1.14.10, which is a breaking change
+node_modules/braces
+  chokidar  2.0.0 - 3.6.0
+  Depends on vulnerable versions of braces
+  node_modules/chokidar
+    nodemon  0.0.0-development || >=1.14.11
+    Depends on vulnerable versions of chokidar
+    node_modules/nodemon
+
+deepmerge-ts  <8.0.0
+Severity: high
+DeepmergeTS has stack exhaustion when merging recursive object graphs - https://github.com/advisories/GHSA-ggr8-5vv4-36mx
+fix available via `npm audit fix --force`
+Will install prisma@6.19.3, which is a breaking change
+node_modules/deepmerge-ts
+  @prisma/config  6.13.0-dev.1 - 8.1.0-dev.4
+  Depends on vulnerable versions of deepmerge-ts
+  node_modules/@prisma/config
+    prisma  6.13.0-dev.1 - 8.1.0-dev.6
+    Depends on vulnerable versions of @prisma/config
+    Depends on vulnerable versions of mysql2
+    node_modules/prisma
+
+mysql2  <=3.23.0
+Severity: high
+MySQL2: Auth Plugin Downgrade to mysql_clear_password Leaks Plaintext Credentials - https://github.com/advisories/GHSA-3f6p-5ww8-9rcr
+MySQL2: Unbounded zlib inflate in compressed MySQL protocol handler allows decompression-bomb DoS - https://github.com/advisories/GHSA-rgwj-5xj2-c3m3
+fix available via `npm audit fix --force`
+Will install prisma@6.19.3, which is a breaking change
+node_modules/mysql2
+
+sprintf-js  *
+Severity: moderate
+sprintf-js vulnerable to denial of service through unbounded precision specifiers - https://github.com/advisories/GHSA-hp3w-g68c-fv3c
+fix available via `npm audit fix --force`
+Will install jest@25.0.0, which is a breaking change
+node_modules/sprintf-js
+  argparse  1.0.0 - 1.0.10
+  Depends on vulnerable versions of sprintf-js
+  node_modules/@istanbuljs/load-nyc-config/node_modules/argparse
+    js-yaml  3.2.7 - 3.15.2
+    Depends on vulnerable versions of argparse
+    node_modules/@istanbuljs/load-nyc-config/node_modules/js-yaml
+      @istanbuljs/load-nyc-config  *
+      Depends on vulnerable versions of js-yaml
+      node_modules/@istanbuljs/load-nyc-config
+        babel-plugin-istanbul  >=6.0.0-beta.0
+        Depends on vulnerable versions of @istanbuljs/load-nyc-config
+        node_modules/babel-plugin-istanbul
+          @jest/transform  >=25.1.0
+          Depends on vulnerable versions of babel-plugin-istanbul
+          node_modules/@jest/transform
+            @jest/core  >=25.1.0
+            Depends on vulnerable versions of @jest/reporters
+            Depends on vulnerable versions of @jest/transform
+            Depends on vulnerable versions of jest-config
+            Depends on vulnerable versions of jest-resolve-dependencies
+            Depends on vulnerable versions of jest-runner
+            Depends on vulnerable versions of jest-runtime
+            Depends on vulnerable versions of jest-snapshot
+            node_modules/@jest/core
+              jest  >=25.1.0
+              Depends on vulnerable versions of @jest/core
+              Depends on vulnerable versions of jest-cli
+              node_modules/jest
+              jest-cli  >=25.1.0
+              Depends on vulnerable versions of @jest/core
+              Depends on vulnerable versions of jest-config
+              node_modules/jest-cli
+            @jest/reporters  >=25.1.0
+            Depends on vulnerable versions of @jest/transform
+            node_modules/@jest/reporters
+            babel-jest  >=25.1.0
+            Depends on vulnerable versions of @jest/transform
+            Depends on vulnerable versions of babel-plugin-istanbul
+            node_modules/babel-jest
+              jest-config  >=25.1.0
+              Depends on vulnerable versions of babel-jest
+              Depends on vulnerable versions of jest-circus
+              Depends on vulnerable versions of jest-runner
+              node_modules/jest-config
+            jest-runner  >=25.1.0
+            Depends on vulnerable versions of @jest/transform
+            Depends on vulnerable versions of jest-runtime
+            node_modules/jest-runner
+            jest-runtime  >=25.1.0
+            Depends on vulnerable versions of @jest/globals
+            Depends on vulnerable versions of @jest/transform
+            Depends on vulnerable versions of jest-snapshot
+            node_modules/jest-runtime
+              jest-circus  >=25.2.4
+              Depends on vulnerable versions of @jest/expect
+              Depends on vulnerable versions of jest-runtime
+              Depends on vulnerable versions of jest-snapshot
+              node_modules/jest-circus
+            jest-snapshot  >=27.0.0-next.0
+            Depends on vulnerable versions of @jest/transform
+            node_modules/jest-snapshot
+              @jest/expect  *
+              Depends on vulnerable versions of jest-snapshot
+              node_modules/@jest/expect
+                @jest/globals  >=28.0.0-alpha.0
+                Depends on vulnerable versions of @jest/expect
+                node_modules/@jest/globals
+              jest-resolve-dependencies  >=27.0.0-next.0
+              Depends on vulnerable versions of jest-snapshot
+              node_modules/jest-resolve-dependencies
+
+26 vulnerabilities (19 moderate, 7 high)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

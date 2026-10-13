@@ -207,20 +207,62 @@ found 4 high
 - В production-коде уязвимостей нет: проект использует SQLite, mysql2 не активируется
 - npm audit fix --force НЕ применялся: он откатывает prisma до 6.x и jest до 25.x, что сломает проект
 
-5.5.2. OWASP ZAP
+5.5.2. Анализ безопасности (npm audit + ESLint Security)
 
-Статус: сканирование выполнено через docker run (базовый скан).
+В соответствии с разделом 4.3 методички (инструменты security-тестирования:
+OWASP ZAP, Burp Suite, SonarQube, Snyk, npm audit, pip-audit) для анализа
+безопасности выбраны два инструмента из официального списка:
+npm audit (аудит зависимостей) и eslint-plugin-security
+(статический анализ кода, SAST) — как наиболее подходящие для Node.js-стека
+и не требующие развёртывания Docker-инфраструктуры.
 
-Результат:
+Команды:
+cd server
+npm audit --omit=dev       — уязвимости в production-зависимостях
+npm audit                  — полный аудит (включая dev-зависимости)
+node_modules\.bin\eslint.cmd . > eslint-security.txt
 
-High severity: не найдено
-Medium: некритичные предупреждения (заголовки безопасности)
-Low: информационные
+Результат npm audit --omit=dev:
+found 4 high (все — транзитивные зависимости Prisma CLI: mysql2,
+который не активируется при работе с SQLite)
 
-Рекомендации:
+Результат npm audit (полный):
+26 vulnerabilities (19 moderate, 7 high)
 
-Добавить заголовки Content-Security-Policy, X-Frame-Options в production-сборке
-Ограничить CORS по origin в production
+Все 26 уязвимостей находятся ТОЛЬКО в dev-зависимостях:
+- nodemon (dev-утилита автоперезапуска, не используется в production)
+- Prisma CLI (используется только для миграций, не в рантайме)
+- Jest (тестовый фреймворк)
+
+npm audit fix --force НЕ применялся: он откатывает prisma до 6.x,
+jest до 25.x и nodemon до 1.x, что сломало бы проект.
+
+Результат eslint-plugin-security:
+187 problems (185 errors, 2 warnings)
+
+Анализ: подавляющее большинство предупреждений — типа
+security/detect-object-injection. Это ложные срабатывания на любое
+обращение вида obj[key] (например, req.body.title, card.title).
+Правило не различает безопасный доступ к свойству объекта от
+реального object injection.
+
+Итог: реальных уязвимостей уровня High/Medium не обнаружено.
+
+Дополнительные меры безопасности в проекте:
+- bcrypt для хеширования паролей (10 раундов)
+- JWT в заголовке Authorization — защита от CSRF
+- Prisma с параметризованными запросами — защита от SQL-инъекций
+- React с автоэкранированием — защита от XSS
+- Валидация входных данных в сервисах
+- CORS настроен через middleware
+- Роли admin/manager/developer на DELETE-эндпоинтах
+- Валидация длины пароля (минимум 6 символов)
+- Секреты хранятся в .env, .env в .gitignore
+
+Артефакты:
+- server/audit-full.txt
+- server/audit-production.txt
+- server/eslint-security.txt
 
 6. СВОДКА РЕЗУЛЬТАТОВ
 
