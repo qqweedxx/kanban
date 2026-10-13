@@ -20,7 +20,14 @@ async function getById(id) {
         include: {
           cards: {
             orderBy: { order: 'asc' },
-            include: { assignee: true, _count: { select: { comments: true } } },
+            include: {
+              assignee: true,
+              comments: {
+                include: { author: true },
+                orderBy: { createdAt: 'asc' },
+              },
+              _count: { select: { comments: true } },
+            },
           },
         },
       },
