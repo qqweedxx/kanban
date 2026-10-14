@@ -47,6 +47,22 @@ async function create(data, userId) {
     throw new Error('columnId обязателен')
   }
 
+  // Проверка WIP-лимита
+  const targetColumn = await prisma.column.findUnique({
+    where: { id: data.columnId },
+    include: { cards: true },
+  })
+  if (!targetColumn) throw new Error('Колонка не найдена')
+
+  if (
+    targetColumn.wipLimit !== null &&
+    targetColumn.cards.length >= targetColumn.wipLimit
+  ) {
+    throw new Error(
+      `В колонке "${targetColumn.title}" достигнут WIP-лимит (${targetColumn.wipLimit})`
+    )
+  }
+
   const card = await prisma.card.create({
     data: {
       title: data.title.trim(),
