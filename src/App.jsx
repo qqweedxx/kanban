@@ -18,7 +18,7 @@ function cardFromAPI(card) {
     labels: card.labels
       ? card.labels.split(',').map((s) => s.trim()).filter(Boolean)
       : [],
-    assignee: card.assignee?.name || card.assignee || '',
+        assignee: card.assigneeName || card.assignee?.name || card.assignee || '',
     comments: (card.comments || []).map((c) => ({
       id: c.id,
       author: c.author?.name || c.author || 'Аноним',
@@ -129,6 +129,7 @@ function App() {
           ? updates.labels.join(',')
           : updates.labels
       }
+      if (updates.assignee !== undefined) apiUpdates.assigneeName = updates.assignee
       await api.updateCard(cardId, apiUpdates)
       await reloadBoard()
     } catch (err) {
@@ -232,20 +233,39 @@ function App() {
   }
 
   async function deleteBoard(boardId) {
-    if (boards.length <= 1) {
-      alert('Нельзя удалить последнюю доску')
-      return
-    }
-    if (!confirm('Удалить доску со всеми колонками и карточками?')) return
-    try {
-      await api.deleteBoard(boardId)
-      const remaining = boards.filter((b) => b.id !== boardId)
-      setBoards(remaining)
-      if (boardId === currentBoardId) setCurrentBoardId(remaining[0].id)
-    } catch (err) {
-      alert(err.message)
-    }
+  if (boards.length <= 1) {
+    alert('Нельзя удалить последнюю доску')
+    return
   }
+  if (!confirm('Удалить доску со всеми колонками и карточками?')) return
+
+  const boardToDelete = boards.find((b) => b.id === boardId)
+  if (!boardToDelete) return
+
+  try {
+    await api.deleteBoard(boardId)
+
+    const remainingBoards = boards.filter((b) => b.id !== boardId)
+
+    const projectStillHasBoards = remainingBoards.some(
+      (b) => b.projectId === boardToDelete.projectId
+    )
+
+    if (!projectStillHasBoards) {
+      try {
+        await api.deleteProject(boardToDelete.projectId)
+        setProjects((prev) => prev.filter((p) => p.id !== boardToDelete.projectId))
+      } catch (err) {
+        console.error('Не удалось удалить пустой проект:', err)
+      }
+    }
+
+    setBoards(remainingBoards)
+    if (boardId === currentBoardId) setCurrentBoardId(remainingBoards[0].id)
+  } catch (err) {
+    alert(err.message)
+  }
+}
 
   async function renameBoard(boardId, newName) {
     if (!newName || !newName.trim()) return
@@ -259,19 +279,21 @@ function App() {
     }
   }
 
-  async function createProject() {
-    const name = prompt('Название проекта:')
-    if (!name || !name.trim()) return
-    try {
-      const project = await api.createProject({ name: name.trim() })
-      setProjects((prev) => [...prev, project])
-      const board = await api.createBoard({ name: 'Основная доска', projectId: project.id })
-      setBoards((prev) => [...prev, board])
-      setCurrentBoardId(board.id)
-    } catch (err) {
-      alert(err.message)
-    }
+  async function createProject(name) {
+  if (!name || !name.trim()) return
+  try {
+    const project = await api.createProject({ name: name.trim() })
+    setProjects((prev) => [...prev, project])
+    const board = await api.createBoard({
+      name: 'Основная доска',
+      projectId: project.id,
+    })
+    setBoards((prev) => [...prev, board])
+    setCurrentBoardId(board.id)
+  } catch (err) {
+    alert(err.message)
   }
+}
 
   const allCards = columns.flatMap((c) => c.cards)
   const availableLabels = Array.from(new Set(allCards.flatMap((c) => c.labels || []))).sort()

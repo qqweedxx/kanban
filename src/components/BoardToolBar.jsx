@@ -13,6 +13,9 @@ function BoardToolbar({
   const [isCreatingBoard, setIsCreatingBoard] = useState(false)
   const [newBoardName, setNewBoardName] = useState('')
 
+  const [isCreatingProject, setIsCreatingProject] = useState(false)
+  const [newProjectName, setNewProjectName] = useState('')
+
   function submitBoard(e) {
     e.preventDefault()
     if (!newBoardName.trim()) return
@@ -21,11 +24,19 @@ function BoardToolbar({
     setIsCreatingBoard(false)
   }
 
+  function submitProject(e) {
+    e.preventDefault()
+    if (!newProjectName.trim()) return
+    onCreateProject(newProjectName.trim())
+    setNewProjectName('')
+    setIsCreatingProject(false)
+  }
+
   return (
     <div className="board-toolbar">
       <select
         className="board-toolbar__select"
-        value={currentBoardId}
+        value={currentBoardId || ''}
         onChange={(e) => onSelectBoard(e.target.value)}
       >
         {projects.map((p) => (
@@ -63,6 +74,28 @@ function BoardToolbar({
             ×
           </button>
         </form>
+      ) : isCreatingProject ? (
+        <form className="board-toolbar__form" onSubmit={submitProject}>
+          <input
+            autoFocus
+            value={newProjectName}
+            onChange={(e) => setNewProjectName(e.target.value)}
+            placeholder="Название проекта"
+            onBlur={() => {
+              if (!newProjectName.trim()) setIsCreatingProject(false)
+            }}
+          />
+          <button type="submit">OK</button>
+          <button
+            type="button"
+            onClick={() => {
+              setNewProjectName('')
+              setIsCreatingProject(false)
+            }}
+          >
+            ×
+          </button>
+        </form>
       ) : (
         <>
           <button
@@ -73,7 +106,7 @@ function BoardToolbar({
           </button>
           <button
             className="board-toolbar__btn"
-            onClick={onCreateProject}
+            onClick={() => setIsCreatingProject(true)}
           >
             + Проект
           </button>

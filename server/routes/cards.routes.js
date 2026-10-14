@@ -103,6 +103,7 @@ router.get('/:id', cardsController.getById)
  *               labels: { type: string }
  *               attachmentUrl: { type: string }
  *               assigneeId: { type: string }
+ *               assigneeName: { type: string }
  *     responses:
  *       200: { description: Карточка обновлена }
  */

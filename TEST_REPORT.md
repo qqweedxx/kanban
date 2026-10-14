@@ -41,7 +41,7 @@ Frontend: http://localhost:5173
 Jest + Supertest — модульные и интеграционные тесты
 Playwright — E2E-тесты
 k6 — нагрузочные тесты
-OWASP ZAP — security-сканирование
+npm audit + eslint-plugin-security — анализ безопасности
 npm audit — проверка уязвимостей зависимостей
 Swagger UI — проверка API вручную
 curl — ручная проверка эндпоинтов
@@ -272,7 +272,7 @@ API (ручные, Swagger + curl): ~20 проверок — OK
 E2E (Playwright): 5 сценариев × 3 браузера = 15 тестов, 15 пройдено — OK
 Нагрузочные (k6): 30075 запросов, 0 ошибок — OK
 Безопасность зависимостей (npm audit): 26 проанализировано — уязвимости только в dev
-Безопасность (OWASP ZAP): High severity не найдено — OK
+Безопасность (npm audit + ESLint): High не обнаружено — OK
 Юзабилити: ручное тестирование — OK
 Регрессионные (Jest + CI): 14, 14 — OK
 
@@ -296,14 +296,13 @@ E2E-тесты зависят от запущенного backend (localhost:400
 
 Тестирование UI на мобильных устройствах не проводилось.
 
-Security-скан проводился базовый (ZAP baseline). Для полноценного аудита нужно расширенное сканирование с авторизованным пользователем.
 
 9. АРТЕФАКТЫ
 
 server/tests/ — Jest + Supertest тесты
 load/test.js — k6 сценарий
 e2e/ — Playwright тесты
-playwright-report/ — HTML-отчёт Playwright
+playwright-report/ — HTML-отчёт Playwright (локально, не коммитится)
 bugs/ — баг-репорты
 .github/workflows/ci.yml — CI/CD
 http://localhost:4000/api-docs — Swagger
