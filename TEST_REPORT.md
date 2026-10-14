@@ -74,42 +74,80 @@ CI/CD пайплайн зелёный
 
 5.1. Модульные и интеграционные тесты (Jest + Supertest)
 
-Расположение: server/tests/
-
 Файлы:
-
-setup.js — настройка окружения
-health.test.js — health check
-auth.test.js — регистрация, вход, /me, ошибки валидации
-cards.test.js — CRUD карточек, права доступа, WIP-лимит
+- setup.js — настройка окружения
+- health.test.js — health check
+- auth.test.js — регистрация, вход, /me, ошибки валидации
+- cards.test.js — CRUD карточек, права доступа, WIP-лимит
+- boards.test.js — CRUD досок, колонок, проектов, карточек
 
 Команда запуска:
 cd server
 npm test
 
 Результат:
-Test Suites: 3 passed, 3 total
-Tests: 14 passed, 14 total
-Time: 13.745 s
+Test Suites: 4 passed, 4 total
+Tests:       40 passed, 40 total
+Time:        2.773 s
+
+Покрытие кода (node_modules\.bin\jest.cmd --coverage):
+Lines:  91.22%
+Branch: 78.19%
+Funcs:  96.22%
+Stmts:  88.88%
+
+Требование ≥80% строк, ≥70% ветвей ВЫПОЛНЕНО.
 
 Покрытые сценарии:
 
-GET /api/health → 200
-POST /api/auth/register → 201, возвращает токен
-POST /api/auth/register с занятым email → 400
-POST /api/auth/register с коротким паролем → 400
-POST /api/auth/login → 200
-POST /api/auth/login с неверным паролем → 401
-GET /api/auth/me без токена → 401
-GET /api/auth/me с токеном → 200
-POST /api/cards → 201
-POST /api/cards без title → 400
-POST /api/cards без токена → 401
-GET /api/cards → 200
-GET /api/boards/:id → 200
-GET /api/boards/:id несуществующей → 404
+Health:
+- GET /api/health → 200
 
-Итог: ВСЕ 14 тестов зелёные.
+Auth:
+- POST /api/auth/register → 201, возвращает токен
+- POST /api/auth/register с занятым email → 400
+- POST /api/auth/register с коротким паролем → 400
+- POST /api/auth/login → 200
+- POST /api/auth/login с неверным паролем → 401
+- GET /api/auth/me без токена → 401
+- GET /api/auth/me с токеном → 200
+
+Boards:
+- GET /api/boards — список
+- POST /api/boards → 201
+- POST /api/boards без name → 400
+- POST /api/boards без projectId → 400
+- GET /api/boards/:id → 200
+- GET /api/boards/:id (несуществующей) → 404
+- PATCH /api/boards/:id → 200
+
+Columns:
+- POST /api/columns → 201
+- POST /api/columns без title / boardId → 400
+- PATCH /api/columns/:id (title, wipLimit) → 200
+- PATCH /api/columns/:id (wipLimit: null) → 200
+
+Cards:
+- POST /api/cards → 201
+- POST /api/cards без title → 400
+- POST /api/cards без токена → 401
+- GET /api/cards → 200
+- GET /api/cards/:id → 200
+- PATCH /api/cards/:id (все поля) → 200
+- POST /api/cards/:id/comments → 201
+- POST /api/cards/:id/comments без text → 400
+- POST /api/cards/:id/move → 200 (с проверкой WIP-лимита)
+- DELETE /api/cards/:id → 200
+- DELETE /api/columns/:id → 200
+
+Projects:
+- GET /api/projects → 200
+- GET /api/projects/:id → 200
+- GET /api/projects/:id (несуществующего) → 404
+- PATCH /api/projects/:id → 200
+- POST /api/projects без name → 400
+
+Итог: ВСЕ 40 тестов зелёные.
 
 5.2. Ручное тестирование API (Swagger UI)
 
@@ -266,15 +304,16 @@ security/detect-object-injection. Это ложные срабатывания �
 
 6. СВОДКА РЕЗУЛЬТАТОВ
 
-Модульные (Jest): 14 тестов, 14 пройдено — OK
-Интеграционные (Supertest): 14 тестов, 14 пройдено — OK
+Модульные (Jest): 40 тестов, 40 пройдено — OK
+Интеграционные (Supertest): 40 тестов, 40 пройдено — OK
 API (ручные, Swagger + curl): ~20 проверок — OK
 E2E (Playwright): 5 сценариев × 3 браузера = 15 тестов, 15 пройдено — OK
 Нагрузочные (k6): 30075 запросов, 0 ошибок — OK
 Безопасность зависимостей (npm audit): 26 проанализировано — уязвимости только в dev
 Безопасность (npm audit + ESLint): High не обнаружено — OK
 Юзабилити: ручное тестирование — OK
-Регрессионные (Jest + CI): 14, 14 — OK
+Регрессионные (Jest + CI): 40, 40 — OK
+Покрытие кода (Jest --coverage): Lines 91.22%, Branch 78.19%
 
 Итог: Все критические функциональные требования подтверждены тестами. CI/CD запускает тесты автоматически при каждом push.
 

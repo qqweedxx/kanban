@@ -8,10 +8,20 @@
     "start": "node index.js",
     "test": "jest --runInBand --forceExit"
   },
-  "jest": {
+      "jest": {
     "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/tests/setup.js"
+    "setupFiles": ["<rootDir>/tests/setup.js"],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/generated/",
+      "/prisma/migrations/"
+    ],
+    "collectCoverageFrom": [
+      "app.js",
+      "controllers/**/*.js",
+      "services/**/*.js",
+      "middleware/**/*.js",
+      "routes/**/*.js"
     ]
   },
   "prisma": {

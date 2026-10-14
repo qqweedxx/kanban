@@ -8,8 +8,8 @@
 ОСНОВНЫЕ ПУНКТЫ
 
 [x] Все API-эндпоинты покрыты интеграционными тестами.
-— 14 тестов Jest + Supertest в server/tests/
-— Покрыты: auth, cards, boards, health
+— 40 тестов Jest + Supertest в server/tests/
+— Покрыты: auth, cards, boards, columns, projects, health
 — Команда запуска: cd server && npm test
 
 [x] E2E-сценарии проходят в Chrome, Firefox, Edge.
@@ -30,11 +30,11 @@
 — ESLint Security: реальных уязвимостей High/Medium не обнаружено
 — Подробности: TEST_REPORT.md, раздел 5.5.2
 
-[~] Покрытие кода ≥80%.
-— Jest-покрытие: основные эндпоинты API покрыты
-— Точный процент измеряется через jest --coverage
-— UI-компоненты покрыты E2E-тестами (Playwright)
-— Требование частично закрыто
+[x] Покрытие кода ≥80%.
+— Замер: node_modules\.bin\jest.cmd --coverage
+— Результат: 91.22% строк, 78.19% ветвей
+— UI-компоненты дополнительно покрыты E2E-тестами Playwright (15 тестов).
+— Отчёт: coverage/lcov-report/index.html
 
 [x] CI/CD запускает все тесты при пуше.
 — GitHub Actions: .github/workflows/ci.yml

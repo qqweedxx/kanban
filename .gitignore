@@ -40,3 +40,6 @@ server/skills-lock.json
 playwright-report/
 test-results/
 playwright/.cache/
+
+# Jest coverage
+server/coverage/

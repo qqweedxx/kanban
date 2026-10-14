@@ -5,11 +5,11 @@
 
 ## Выбранный стек
 
-- **Frontend:** React + TypeScript (Vite)
+- **Frontend:** React + Vite (JavaScript)
 - **Backend:** Node.js + Express 5
 - **БД:** SQLite + Prisma ORM
 - **Аутентификация:** JWT + bcrypt
-- **Тестирование:** Jest, Supertest, Playwright, k6, OWASP ZAP
+- **Тестирование:** Jest, Supertest, Playwright, k6, npm audit, eslint-plugin-security
 - **CI/CD:** GitHub Actions
 
 ## Обоснование
