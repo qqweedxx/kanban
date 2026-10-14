@@ -15,7 +15,6 @@ async function list(filters = {}) {
     orderBy: { order: 'asc' },
   })
 
-  // Фильтр по меткам (у нас метки — строка "bug,urgent")
   let result = cards
   if (filters.label) {
     result = cards.filter((c) =>
@@ -47,7 +46,6 @@ async function create(data, userId) {
     throw new Error('columnId обязателен')
   }
 
-  // Проверка WIP-лимита
   const targetColumn = await prisma.column.findUnique({
     where: { id: data.columnId },
     include: { cards: true },
@@ -73,6 +71,7 @@ async function create(data, userId) {
       attachmentUrl: data.attachmentUrl || null,
       columnId: data.columnId,
       assigneeId: data.assigneeId || null,
+      assigneeName: data.assigneeName || null,
     },
   })
 
@@ -101,6 +100,7 @@ async function update(id, data, userId) {
       ...(data.labels !== undefined && { labels: data.labels }),
       ...(data.attachmentUrl !== undefined && { attachmentUrl: data.attachmentUrl }),
       ...(data.assigneeId !== undefined && { assigneeId: data.assigneeId }),
+      ...(data.assigneeName !== undefined && { assigneeName: data.assigneeName }),
     },
   })
 

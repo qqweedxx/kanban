@@ -74,6 +74,8 @@ model Card {
   assigneeId String?
   assignee   User?   @relation("CardAssignee", fields: [assigneeId], references: [id])
 
+  assigneeName  String?
+
   comments   Comment[]
   history    History[]
 }
