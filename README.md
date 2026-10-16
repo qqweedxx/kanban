@@ -10,7 +10,7 @@ Kanban-доска (аналог Jira)
 Frontend: React + Vite, @dnd-kit (drag-and-drop), React Router
 Backend: Node.js + Express 5, Prisma ORM 7, SQLite
 Аутентификация: JWT + bcrypt
-Тестирование: Jest + Supertest (unit/integration), Playwright (E2E), k6 (нагрузочные), OWASP ZAP (security)
+Тестирование: Jest + Supertest (unit/integration), Playwright (E2E), k6 (нагрузочные), npm audit + eslint-plugin-security
 CI/CD: GitHub Actions
 Документация API: Swagger (OpenAPI 3.0)
 
@@ -109,13 +109,19 @@ Authorization: Bearer <JWT-токен>
 cd server
 npm test
 
-Запускается 14 тестов:
+Запускается 40 тестов:
 
-Health check
-Регистрация, вход, /me, ошибки валидации
-Создание, чтение, удаление карточек
-Проверка прав доступа (401 без токена)
-Проверка WIP-лимита
+- Health check
+- Регистрация, вход, /me, ошибки валидации
+- CRUD карточек (создание, чтение, обновление, удаление)
+- CRUD досок, колонок, проектов
+- Перемещение карточек между колонками
+- Комментарии
+- Проверка прав доступа (401 без токена, 403 для developer)
+- Проверка WIP-лимита
+
+Покрытие кода: 91.22% строк, 78.19% ветвей.
+Замер: node_modules\.bin\jest.cmd --coverage
 
 Нагрузочные тесты (k6)
 cd load
@@ -123,20 +129,25 @@ k6 run test.js
 Сценарий эмулирует 100 виртуальных пользователей: логин → получение доски → получение карточек. Параметры нагрузки: разгон → удержание → сброс.
 
 E2E-тесты (Playwright)
-npx playwright test
+node_modules\.bin\playwright.cmd test
 
-Сценарии:
+Запускается 15 тестов (5 сценариев × 3 браузера):
 
-1. Регистрация → вход → доска → создание карточки → перемещение → выход
-2. Проверка прав доступа
-3. Поиск и фильтрация
+1. Логин и загрузка доски
+2. Создание карточки
+3. Поиск карточек
+4. Открытие модалки карточки
+5. Logout через меню профиля
+
+Браузеры: Chromium, Firefox, Edge.
 
 Безопасность
 
 cd server
-npm audit
+npm audit                    — аудит зависимостей
+node_modules\.bin\eslint.cmd . — статический анализ кода (SAST)
 
-Плюс сканирование OWASP ZAP (см. TEST_REPORT.md).
+Подробнее: см. TEST_REPORT.md, раздел 5.5.
 
 CI/CD
 
@@ -148,7 +159,7 @@ CI/CD
 2. Генерируется Prisma Client
 3. Применяются миграции
 4. Заполняется БД seed-данными
-5. Запускаются Jest-тесты (14 тестов)
+5. Запускаются Jest-тесты (40 тестов)
  
 Статус CI: https://github.com/qqweedxx/kanban/actions
 
